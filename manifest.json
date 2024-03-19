@@ -6,9 +6,13 @@
   "action": {
     "default_popup": "index.html"
   },
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
   "content_scripts": [
     {
-      "js": ["scripts/content.js"],
+      "js": ["dist/content.js"],
       "matches": [
         "https://github.com/hamzouvic/*"
       ]
