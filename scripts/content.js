@@ -1,4 +1,4 @@
-import {getConversation} from "../src/ApiCalls";
+import {getConversation, submitPrompt} from "../src/ApiCalls";
 
 export async function generateWidget() {
 
@@ -6,14 +6,16 @@ export async function generateWidget() {
     badge.style.cssText = 'color:black;display:grid;padding:10px 20px;border-radius:15px;overflow:hidden;background-color:white;width:70vw;height:70vh;position:absolute;top:50%;left:50%;  transform: translate(-50%, -50%);z-index:100;'
     let layout;
     layout = document.createElement('div')
-    layout.style.cssText = 'display:flex; flex-direction:column;width:100%;height:100%;'
+    layout.style.cssText = 'display:flex; flex-direction:column;width:100%;height:80%;'
     let prompts;
     prompts = document.createElement("div")
-    prompts.style.cssText = 'flex: auto;'
+    prompts.id = 'promptsLayout'
+    prompts.style.cssText = 'flex: auto;overflow-y:auto;height:inherit'
     layout.appendChild(prompts)
-    prompts.innerText = 'hello this is a prompts'
     let textBox;
-    textBox = document.createElement('textarea')
+    textBox = document.createElement('input')
+    textBox.type = 'text'
+    textBox.id = 'prompt'
     textBox.style.cssText = 'background-color:gray;width:100%;flex:initial; position:relative'
     let submit;
     submit = document.createElement('button')
@@ -46,8 +48,29 @@ export async function generateWidget() {
 
     document.body.appendChild(badge);
     const result = await getConversation()
-    console.log(result)
-    prompts.innerText = result
+    result.map((prompt)=>{
+        const text = document.createElement('div')
+        text.style.cssText = 'width:100%;height:fit-content;padding:10px 20px;'
+        text.innerText = prompt.content
+        prompts.appendChild(text)
+    })
+    submit.addEventListener('click',sendData)
 }
+async function sendData(){
+    const layout = document.getElementById("promptsLayout")
+    const text = document.createElement('div')
+    text.style.cssText = 'width:100%;height:fit-content;padding:10px 20px;'
+
+    console.log('sending')
+    const prompt = document.getElementById('prompt').value
+    text.innerText = prompt
+    layout.appendChild(text)
+
+    const response = await submitPrompt(prompt)
+    console.log(response)
+    text.innerText = response.content
+    layout.appendChild(text)
+}
+
 
 await generateWidget()
